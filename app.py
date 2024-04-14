@@ -37,7 +37,7 @@ session = Session(engine)
 #################################################
 app = Flask(__name__)
 # adding image to landing page
-#image_path = os.path.join("../Resources/Images.jpeg")
+#image_path = os.path.join("/static/Images.jpeg")
 
 
 
@@ -49,20 +49,14 @@ app = Flask(__name__)
 def welcome():
    
     return (
-     
-
-     #f"<img src='/static/image_name.jpg' alt='Image'>
-     f"Welcome to Hawaii Climate Analysis API!"
-     f"Available Routes:<br/>"
-       
-     f"/api/v1.0/precipitation"
-     f"Available Routes:<br/>"
-     f"/api/v1.0/stations"
-     f"Available Routes:<br/>"
-     f"/api/v1.0/tobs"
-     f"Available Routes:<br/>"
-     f"/api/v1.0/temp/start/end"
-   
+        #f"<img src=image_path, alt='Image'>"
+        "Welcome to Hawaii Climate Analysis API!"
+        "Available Routes:<br/>"
+        "/api/v1.0/precipitation<br/>" 
+        "/api/v1.0/stations<br/>"
+        "/api/v1.0/tobs<br/>"
+        "/api/v1.0/temp/&lt;start_date&gt;/<br/>"
+        "/api/v1.0/temp/&lt;start_date&gt;/&lt;end_date&gt/<br/>"
    )
 #@app.route('/image')
 #def get_image():
@@ -114,5 +108,5 @@ def stats(start=None, end=None):
    temps = list(np.ravel(results))
    return jsonify(temps)
 
-
-    
+if __name__ == "__main__":
+    app.run()

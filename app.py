@@ -57,6 +57,7 @@ def welcome():
         "/api/v1.0/tobs<br/>"
         "/api/v1.0/temp/&lt;start_date&gt;/<br/>"
         "/api/v1.0/temp/&lt;start_date&gt;/&lt;end_date&gt/<br/>"
+        "To format the date '2022-01-01'"
    )
 #@app.route('/image')
 #def get_image():
@@ -64,11 +65,13 @@ def welcome():
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
-    recent_date = dt.date(('2017-08-23',)) - dt.timedelta(days=365)
+    recent_date = dt.date(2017,8,23) - dt.timedelta(days=365)
     precipitation = session.query(Measurement.date, Measurement.prcp).\
     filter(Measurement.date >= recent_date).all()
     precipit = {date:prcp for date, prcp in precipitation}
+    print(precipit)
     return jsonify(precipit)
+
 
 @app.route("/api/v1.0/stations")
 def stations():
@@ -79,8 +82,7 @@ def stations():
 @app.route("/api/v1.0/tobs")
 def tobs():
 
-    def temp_monthly():
-        recent_date = dt.date(2017, 8, 23) - dt.timedelta(days=365)
+    recent_date = dt.date(2017, 8, 23) - dt.timedelta(days=365)
 
     results = session.query(Measurement.tobs).\
         filter(Measurement.station == 'USC00519281').\
@@ -90,23 +92,28 @@ def tobs():
 
 
 
-@app.route("/api/v1.0/temp/<start>")
-@app.route("/api/v1.0/temp/<end>")
+@app.route("/api/v1.0/temp/<start>/")
 
-def stats(start=None, end=None):
-   sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+@app.route("/api/v1.0/temp/<start>/<end>/")
 
-   if not end:
-       results = session.query(*sel).\
-           filter(Measurement.date >= start).all()
-       temps = list(np.ravel(results))
-       return jsonify(temps)
 
-   results = session.query(*sel).\
-       filter(Measurement.date >= start).\
-       filter(Measurement.date <= end).all()
-   temps = list(np.ravel(results))
-   return jsonify(temps)
+
+def stats(start, end= None):
+    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+
+    if not end:
+        starting_date = dt.datetime.strptime(start,"%Y-%m-%d")
+
+        results = session.query(*sel).\
+                filter(Measurement.date >= starting_date).all()
+        temps = list(np.ravel(results))
+        return jsonify(temps)
+
+    results = session.query(*sel).\
+        filter(Measurement.date >= start).\
+        filter(Measurement.date <= end).all()
+    temps = list(np.ravel(results))
+    return jsonify(temps)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
